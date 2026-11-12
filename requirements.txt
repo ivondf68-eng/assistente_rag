@@ -1,0 +1,7 @@
+streamlit
+google-genai
+chromadb
+pymupdf
+python-dotenv
+pytesseract
+Pillow
