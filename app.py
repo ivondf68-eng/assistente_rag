@@ -62,7 +62,7 @@ if st.button(
     disabled=not arquivos
 ):
 
-    pasta_documentos = Path("data/documentos")
+    pasta_documentos = Path("data/documents")
     pasta_documentos.mkdir(parents=True, exist_ok=True)
 
     client = None
