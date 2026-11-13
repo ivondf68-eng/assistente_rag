@@ -1,0 +1,4 @@
+[server]
+
+# Tamanho máximo permitido por arquivo enviado (em MB)
+maxUploadSize = 10
