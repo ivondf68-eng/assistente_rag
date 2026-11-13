@@ -23,13 +23,18 @@ def validar_pdf(nome_arquivo, conteudo):
     """
     Valida o formato, tamanho e estrutura de um arquivo PDF.
     """
+
     if not nome_arquivo.lower().endswith(".pdf"):
         return False, "O arquivo precisa estar no formato PDF."
 
-    tamanho_maximo = 20 * 1024 * 1024
+    tamanho_maximo = 10 * 1024 * 1024
 
     if len(conteudo) > tamanho_maximo:
-        return False, "O arquivo ultrapassa o limite de 20 MB."
+        return False, "O arquivo ultrapassa o limite de 10 MB."
+
+    # Verifica a assinatura do arquivo PDF
+    if b"%PDF-" not in conteudo[:1024]:
+        return False, "O arquivo não possui uma assinatura PDF válida."
 
     try:
         with pymupdf.open(
