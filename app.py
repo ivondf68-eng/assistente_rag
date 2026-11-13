@@ -193,7 +193,15 @@ if st.button(
 
             total_processados += 1
 
-            if resultado["total_chunks"] == 0:
+            if resultado.get("duplicado"):
+                st.warning(
+                    f"{nome_documento}: este documento já está "
+                    f"armazenado com o nome "
+                    f"{resultado['documento_original']}. "
+                    "Nenhum novo embedding foi gerado."
+                )
+
+            elif resultado["total_chunks"] == 0:
                 st.warning(
                     f"{nome_documento}: nenhum texto encontrado."
                 )

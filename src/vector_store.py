@@ -20,7 +20,7 @@ def conectar_banco(nome_colecao="documentos"):
     return cliente, colecao
 
 
-def armazenar_chunks(colecao, resultados, documento="exemplo.pdf"):
+def armazenar_chunks(colecao, resultados, documento="exemplo.pdf", hash_documento=None):
     """
     Armazena os textos, embeddings e metadados no ChromaDB.
     """
@@ -48,7 +48,8 @@ def armazenar_chunks(colecao, resultados, documento="exemplo.pdf"):
             {
                 "pagina": item["pagina"],
                 "indice_chunk": item["indice_chunk"],
-                "documento": documento
+                "documento": documento,
+                "hash_sha256": hash_documento or ""
             }
             for item in resultados
         ]
