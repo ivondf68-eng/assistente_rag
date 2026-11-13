@@ -1,6 +1,8 @@
 import os
 from pathlib import Path
 
+import pymupdf
+
 import streamlit as st
 from dotenv import load_dotenv
 from google import genai
@@ -10,6 +12,37 @@ from src.vector_store import conectar_banco, buscar_chunks
 from src.embeddings import gerar_embedding
 from src.generator import gerar_resposta
 
+def validar_pdf(nome_arquivo, conteudo):
+    """
+    Valida o formato, tamanho e estrutura de um arquivo PDF.
+    """
+    if not nome_arquivo.lower().endswith(".pdf"):
+        return False, "O arquivo precisa estar no formato PDF."
+
+    tamanho_maximo = 20 * 1024 * 1024
+
+    if len(conteudo) > tamanho_maximo:
+        return False, "O arquivo ultrapassa o limite de 20 MB."
+
+    try:
+        with pymupdf.open(
+            stream=conteudo,
+            filetype="pdf"
+        ) as documento:
+
+            if documento.is_encrypted:
+                return False, "PDF protegido por senha não é permitido."
+
+            if documento.page_count == 0:
+                return False, "O PDF não possui páginas."
+
+            if documento.page_count > 100:
+                return False, "O PDF ultrapassa o limite de 100 páginas."
+
+    except Exception:
+        return False, "O arquivo não é um PDF válido ou está corrompido."
+
+    return True, "PDF válido."
 
 st.set_page_config(
     page_title="Assistente RAG",
