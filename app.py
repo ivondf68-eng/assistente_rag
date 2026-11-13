@@ -103,12 +103,20 @@ if arquivos:
 else:
     st.info("Selecione arquivos PDF para começar.")
 
+arquivos_validos = (
+    bool(arquivos)
+    and all(
+        arquivo.size <= LIMITE_PDF_BYTES
+        for arquivo in arquivos
+    )
+)
+
 
 # Botão para processar os documentos
 if st.button(
     "Processar documentos",
     icon=":material/cloud_upload:",
-    disabled=not arquivos
+    disabled=not arquivos_validos
 ):
 
     pasta_documentos = Path("data/documents")
