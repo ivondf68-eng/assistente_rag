@@ -2,6 +2,7 @@ import os
 from pathlib import Path
 
 import pymupdf
+import logging
 
 import streamlit as st
 from dotenv import load_dotenv
@@ -11,6 +12,12 @@ from src.document_processor import processar_documento
 from src.vector_store import conectar_banco, buscar_chunks
 from src.embeddings import gerar_embedding
 from src.generator import gerar_resposta
+
+# Configuração do registro de erros
+logging.basicConfig(
+    level=logging.ERROR,
+    format="%(asctime)s - %(levelname)s - %(message)s"
+)
 
 def validar_pdf(nome_arquivo, conteudo):
     """
@@ -195,8 +202,13 @@ if st.button(
             f"Total de chunks no ChromaDB: {colecao.count()}"
         )
 
-    except Exception as erro:
-        st.error(f"Erro ao processar documentos: {erro}")
+    except Exception:
+        logging.exception("Erro ao processar documentos.")
+
+        st.error(
+            "Ocorreu um erro ao processar os documentos. "
+            "Tente novamente."
+        )
 
     finally:
         if client is not None:
@@ -289,8 +301,13 @@ if pergunta:
 
                         st.divider()
 
-    except Exception as erro:
-        st.error(f"Erro ao consultar documento: {erro}")
+    except Exception:
+        logging.exception("Erro ao consultar documentos.")
+
+        st.error(
+            "Ocorreu um erro ao consultar os documentos. "
+            "Tente novamente."
+        )
 
     finally:
         if client is not None:
