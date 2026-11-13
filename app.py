@@ -72,6 +72,9 @@ st.divider()
 # Área de envio de documentos
 st.subheader(":material/document_search: Documentos")
 
+LIMITE_PDF_MB = 10
+LIMITE_PDF_BYTES = LIMITE_PDF_MB * 1024 * 1024
+
 arquivos = st.file_uploader(
     "Selecione um ou mais arquivos PDF",
     type=["pdf"],
@@ -86,10 +89,16 @@ if arquivos:
     for arquivo in arquivos:
         tamanho_kb = arquivo.size / 1024
 
-        st.write(
-            f":material/attach_file: **{arquivo.name}** — "
-            f"{tamanho_kb:.2f} KB"
-        )
+        if arquivo.size > LIMITE_PDF_BYTES:
+            st.error(
+                f"**{arquivo.name}** — {tamanho_kb:.2f} KB. "
+                f"Arquivo excede o limite de {LIMITE_PDF_MB} MB."
+            )
+        else:
+            st.write(
+                f":material/attach_file: **{arquivo.name}** — "
+                f"{tamanho_kb:.2f} KB"
+            )
 
 else:
     st.info("Selecione arquivos PDF para começar.")
