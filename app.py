@@ -125,6 +125,16 @@ if st.button(
 
             conteudo = arquivo.getvalue()
 
+            # Valida o arquivo antes de salvá-lo
+            valido, mensagem = validar_pdf(
+                nome_arquivo=nome_documento,
+                conteudo=conteudo
+            )
+
+            if not valido:
+                st.error(f"{nome_documento}: {mensagem}")
+                continue
+
             # Evita sobrescrever um documento diferente
             if caminho_pdf.exists():
 
