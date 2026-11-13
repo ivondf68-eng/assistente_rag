@@ -14,6 +14,12 @@ def processar_documento(caminho_pdf, colecao, client):
     """
 
     caminho_pdf = Path(caminho_pdf)
+
+    if not caminho_pdf.is_file():
+        raise FileNotFoundError(
+            f"Arquivo não encontrado: {caminho_pdf}"
+        )
+
     nome_documento = caminho_pdf.name
 
     # 1. Extrai o texto do PDF
