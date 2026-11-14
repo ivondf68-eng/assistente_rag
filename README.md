@@ -184,6 +184,10 @@ Esses diretórios contêm dados locais e não devem ser enviados ao repositório
 
 ## Demonstração
 
+### Interface do Assistente RAG
+
 ![Interface do Assistente RAG](https://github.com/ivondf68-eng/assistente_rag/blob/main/assets/assistante-rag.png)
+
+### Vídeo demonstrativo do Assistente RAG
 
 [![Vídeo demonstrativo do Assistente RAG](https://img.youtube.com/vi/z8UHmTgUR4M/0.jpg)](https://youtu.be/z8UHmTgUR4M)
