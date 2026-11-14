@@ -1,3 +1,4 @@
+
 import hashlib
 
 from pathlib import Path
@@ -47,6 +48,13 @@ def processar_documento(caminho_pdf, colecao, client):
             "documento_original": documento_original
         }
 
+    # Identifica chunks anteriormente armazenados com esse nome
+    registros_anteriores = colecao.get(
+        where={"documento": nome_documento}
+    )
+
+    ids_anteriores = registros_anteriores["ids"]
+
     # 1. Extrai o texto do PDF
     paginas = extrair_texto_pdf(str(caminho_pdf))
 
@@ -58,44 +66,41 @@ def processar_documento(caminho_pdf, colecao, client):
             "documento": nome_documento,
             "total_chunks": 0,
             "novos_chunks": 0,
-            "ja_armazenados": 0
+            "ja_armazenados": len(ids_anteriores)
         }
 
-    # 3. Identifica os chunks já armazenados
-    ids = [
+    # 3. Gera embeddings para todos os chunks
+    resultados = gerar_embeddings(
+        chunks,
+        client
+    )
+
+    # 4. Atualiza os registros no ChromaDB
+    total_novos = armazenar_chunks(
+        colecao=colecao,
+        resultados=resultados,
+        documento=nome_documento,
+        hash_documento=hash_documento
+    )
+
+    # 5. Remove chunks antigos que não existem mais
+    ids_novos = {
         f"{nome_documento}_{chunk['chunk_id']}"
         for chunk in chunks
+    }
+
+    ids_obsoletos = [
+        identificador
+        for identificador in ids_anteriores
+        if identificador not in ids_novos
     ]
 
-    ids_existentes = set(colecao.get(ids=ids)["ids"])
-
-    # 4. Separa somente os chunks pendentes
-    chunks_pendentes = [
-        chunk for chunk in chunks
-        if f"{nome_documento}_{chunk['chunk_id']}"
-        not in ids_existentes
-    ]
-
-    total_novos = 0
-
-    # 5. Gera embeddings somente para os chunks novos
-    if chunks_pendentes:
-        resultados = gerar_embeddings(
-            chunks_pendentes,
-            client
-        )
-
-        # 6. Armazena os resultados
-        total_novos = armazenar_chunks(
-            colecao=colecao,
-            resultados=resultados,
-            documento=nome_documento,
-            hash_documento=hash_documento
-        )
+    if ids_obsoletos:
+        colecao.delete(ids=ids_obsoletos)
 
     return {
         "documento": nome_documento,
         "total_chunks": len(chunks),
         "novos_chunks": total_novos,
-        "ja_armazenados": len(ids_existentes)
+        "ja_armazenados": 0
     }
