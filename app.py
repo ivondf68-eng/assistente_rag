@@ -62,6 +62,10 @@ st.set_page_config(
     layout="wide"
 )
 
+# Inicializa o histórico da conversa
+if "historico" not in st.session_state:
+    st.session_state.historico = []
+
 
 # Cabeçalho da aplicação
 st.title(":material/library_books: Assistente RAG")
@@ -248,16 +252,54 @@ if st.button(
 st.divider()
 
 
+
 # Área de perguntas
 st.subheader(":material/comment: Converse com seus documentos")
 
 
-pergunta = st.chat_input("Digite sua pergunta sobre os documentos...")
+# Exibe o histórico da conversa
+for mensagem in st.session_state.historico:
+
+    with st.chat_message(mensagem["role"]):
+        st.markdown(mensagem["conteudo"])
+
+        # Exibe as fontes utilizadas na resposta
+        if mensagem.get("fontes"):
+            with st.expander(
+                "Consultar trechos utilizados como contexto"
+            ):
+                for i, fonte in enumerate(mensagem["fontes"], start=1):
+
+                    st.markdown(
+                        f"**Trecho {i} — {fonte['documento']} "
+                        f"(Página {fonte['pagina']})**"
+                    )
+
+                    st.write(fonte["texto"])
+                    st.divider()
+
+
+# Campo de entrada da pergunta
+pergunta = st.chat_input(
+    "Digite sua pergunta sobre os documentos..."
+)
+
 
 if pergunta:
 
+    # Adiciona a pergunta ao histórico
+    st.session_state.historico.append({
+        "role": "user",
+        "conteudo": pergunta,
+        "fontes": []
+    })
+
+    # Exibe a pergunta enviada
+    with st.chat_message("user"):
+        st.markdown(pergunta)
+
     client = None
-    
+
     try:
         # Carrega a chave da API
         load_dotenv()
@@ -269,18 +311,19 @@ if pergunta:
                 "Chave GEMINI_API_KEY não encontrada."
             )
 
-        #Conecta ao Gemini e ao ChromaDB
+        # Conecta ao Gemini e ao ChromaDB
         client = genai.Client(api_key=api_key)
 
         _, colecao = conectar_banco()
 
         if colecao.count() == 0:
-            st.warning(
-                "Nenhum documento foi processado ainda."
-            )
+            resposta = "Nenhum documento foi processado ainda."
+
+            fontes = []
 
         else:
             with st.spinner("Buscando informações nos documentos..."):
+
                 # 1. Gera o embedding da pergunta
                 embedding_pergunta = gerar_embedding(
                     texto=pergunta.strip(),
@@ -298,37 +341,57 @@ if pergunta:
                 )
 
             if not chunks:
-                st.warning(
-                    "Não foram encontrados trechos relevantes."
+                resposta = (
+                    "Não foram encontrados trechos relevantes "
+                    "nos documentos."
                 )
+
+                fontes = []
+
             else:
                 with st.spinner("Elaborando resposta..."):
-                    #3. Gera a resposta utilizando os chunks
+
+                    # 3. Gera a resposta utilizando os chunks
                     resposta = gerar_resposta(
                         pergunta=pergunta.strip(),
                         chunks=chunks,
                         client=client
                     )
 
-                #4. Exibe a resposta
-                st.subheader("Resposta")
-                st.markdown(resposta)
+                # 4. Prepara as fontes utilizadas
+                fontes = [
+                    {
+                        "documento": chunk["metadados"]["documento"],
+                        "pagina": chunk["metadados"]["pagina"],
+                        "texto": chunk["texto"]
+                    }
+                    for chunk in chunks
+                ]
 
-                #Exibe os trechos utilizados
+        # 5. Armazena a resposta no histórico
+        st.session_state.historico.append({
+            "role": "assistant",
+            "conteudo": resposta,
+            "fontes": fontes
+        })
+
+        # 6. Exibe a resposta
+        with st.chat_message("assistant"):
+
+            st.markdown(resposta)
+
+            if fontes:
                 with st.expander(
                     "Consultar trechos utilizados como contexto"
                 ):
-                    for i, chunk in enumerate(chunks, start=1):
-                        documento = chunk["metadados"]["documento"]
-                        pagina = chunk["metadados"]["pagina"]
+                    for i, fonte in enumerate(fontes, start=1):
 
                         st.markdown(
-                            f"**Trecho {i} — {documento} "
-                            f"(Página {pagina})**"
+                            f"**Trecho {i} — {fonte['documento']} "
+                            f"(Página {fonte['pagina']})**"
                         )
 
-                        st.write(chunk["texto"])
-
+                        st.write(fonte["texto"])
                         st.divider()
 
     except Exception:
