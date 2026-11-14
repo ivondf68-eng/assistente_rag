@@ -117,7 +117,7 @@ Para o reconhecimento de documentos em português, é necessário disponibilizar
 ### 1. Clone o repositório
 
 ```bash
-git clone URL_DO_REPOSITORIO
+git clone https://github.com/ivondf68-eng/assistente_rag.git
 ```
 
 Entre na pasta do projeto:
@@ -184,6 +184,6 @@ Esses diretórios contêm dados locais e não devem ser enviados ao repositório
 
 ## Demonstração
 
-![Interface do Assistente RAG](assets/assistente-rag.png)
+![Interface do Assistente RAG](https://github.com/ivondf68-eng/assistente_rag/blob/main/assets/assistante-rag.png)
 
 ![Vídeo demonstrativo do Assistente RAG](https://youtu.be/z8UHmTgUR4M)
