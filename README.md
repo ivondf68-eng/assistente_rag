@@ -181,3 +181,7 @@ Esses diretórios contêm dados locais e não devem ser enviados ao repositório
 - O OCR pode apresentar imprecisões em documentos com baixa resolução, tabelas ou formatações complexas.
 - O histórico de conversa é mantido durante a sessão da aplicação, mas não é persistido como histórico permanente.
 - O banco vetorial é local e compartilhado entre as sessões que utilizam a mesma instalação.
+
+## Demonstração
+
+![Interface do Assistente RAG](assets/assistente-rag.png)
