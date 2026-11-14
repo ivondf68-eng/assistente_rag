@@ -78,8 +78,20 @@ st.write(
 st.divider()
 
 
-# Área de envio de documentos
-st.subheader(":material/document_search: Documentos")
+# Área de perguntas
+col_titulo, col_limpar = st.columns([5, 1])
+
+with col_titulo:
+    st.subheader(":material/comment: Converse com seus documentos")
+
+with col_limpar:
+    if st.button(
+        "Limpar conversa",
+        icon=":material/delete_sweep:",
+        disabled=not st.session_state.historico
+    ):
+        st.session_state.historico = []
+        st.rerun()
 
 LIMITE_PDF_MB = 10
 LIMITE_PDF_BYTES = LIMITE_PDF_MB * 1024 * 1024
