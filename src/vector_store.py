@@ -57,33 +57,6 @@ def armazenar_chunks(colecao, resultados, documento="exemplo.pdf", hash_document
 
     return len(resultados)
 
-def atualizar_hash_documento(colecao, documento, hash_documento):
-    """
-    Atualiza o hash SHA-256 nos metadados dos chunks
-    de um documento já armazenado.
-    """
-
-    resultado = colecao.get(
-        where={"documento": documento},
-        include=["metadatas"]
-    )
-
-    if not resultado["ids"]:
-        return 0
-
-    metadados_atualizados = []
-
-    for metadados in resultado["metadatas"]:
-        metadados["hash_sha256"] = hash_documento
-        metadados_atualizados.append(metadados)
-
-    colecao.update(
-        ids=resultado["ids"],
-        metadatas=metadados_atualizados
-    )
-
-    return len(resultado["ids"])
-
 
 def buscar_chunks(colecao, embedding_pergunta, quantidade=3):
     """
