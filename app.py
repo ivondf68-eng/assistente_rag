@@ -77,22 +77,6 @@ st.write(
 
 st.divider()
 
-
-# Área de perguntas
-col_titulo, col_limpar = st.columns([5, 1])
-
-with col_titulo:
-    st.subheader(":material/comment: Converse com seus documentos")
-
-with col_limpar:
-    if st.button(
-        "Limpar conversa",
-        icon=":material/delete_sweep:",
-        disabled=not st.session_state.historico
-    ):
-        st.session_state.historico = []
-        st.rerun()
-
 LIMITE_PDF_MB = 10
 LIMITE_PDF_BYTES = LIMITE_PDF_MB * 1024 * 1024
 
@@ -266,7 +250,10 @@ st.divider()
 
 
 # Área de perguntas
-st.subheader(":material/comment: Converse com seus documentos")
+col_titulo, col_limpar = st.columns([5, 1])
+
+with col_titulo:
+    st.subheader(":material/comment: Converse com seus documentos")
 
 
 # Exibe o histórico da conversa
@@ -417,3 +404,13 @@ if pergunta:
     finally:
         if client is not None:
             client.close()
+
+# Botão para limpar o histórico
+with col_limpar:
+    if st.button(
+        "Limpar conversa",
+        icon=":material/delete_sweep:",
+        disabled=not st.session_state.historico
+    ):
+        st.session_state.historico = []
+        st.rerun()
