@@ -185,3 +185,5 @@ Esses diretórios contêm dados locais e não devem ser enviados ao repositório
 ## Demonstração
 
 ![Interface do Assistente RAG](assets/assistente-rag.png)
+
+![Vídeo demonstrativo do Assistente RAG](https://youtu.be/z8UHmTgUR4M)
